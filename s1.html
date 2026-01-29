@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="3600">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 업무 현황 - 샤프트리서치</title>
+
+    <!-- SEO 메타 태그 -->
+    <meta name="description" content="샤프트리서치 주간 업무 및 출장 현황표입니다. 연구원들의 출장, 외근, 사내근무 일정을 확인할 수 있습니다.">
+    <meta name="keywords" content="샤프트리서치, SAPPT, 업무현황, 출장현황, 연구소일정">
+    <meta name="author" content="샤프트리서치">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.sappt.co.kr/s1.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="주간 업무 현황 - 샤프트리서치">
+    <meta property="og:description" content="샤프트리서치 주간 업무 및 출장 현황표">
+    <meta property="og:url" content="https://www.sappt.co.kr/s1.html">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:site_name" content="샤프트리서치">
+    <style>
+        /* 기본 스타일 설정 - 다크모드 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-size: clamp(14px, 1.5vmin, 28px);
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            background-color: #2d2d2d;
+            padding: clamp(10px, 1vmin, 30px);
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: clamp(5px, 0.8vmin, 15px);
+            border-bottom: 2px solid #64b5f6;
+            padding-bottom: clamp(5px, 0.8vmin, 15px);
+            flex-shrink: 0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(18px, 2.2vmin, 36px);
+            color: #64b5f6;
+        }
+
+        .date-range {
+            font-size: clamp(12px, 1.8vmin, 26px);
+            font-weight: bold;
+            color: #b0b0b0;
+        }
+
+        /* 테이블 스타일 */
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        thead {
+            flex-shrink: 0;
+        }
+
+        tbody {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+        }
+
+        tbody tr {
+            flex: 1;
+            display: flex;
+            border-bottom: 1px solid #555555;
+        }
+
+        tbody tr:last-child {
+            border-bottom: 1px solid #555555;
+        }
+
+        th, td {
+            border-right: 1px solid #555555;
+            padding: clamp(8px, 1vmin, 16px);
+            text-align: center;
+            font-size: clamp(12px, 1.5vmin, 26px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        thead tr {
+            display: flex;
+            flex-shrink: 0;
+        }
+
+        thead th {
+            border-bottom: 1px solid #555555;
+        }
+
+        th {
+            background-color: #3a3a3a;
+            color: #c0c0c0;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        th small {
+            font-weight: normal;
+            color: #a0a0a0;
+        }
+
+        td:first-child {
+            font-weight: bold;
+            background-color: #3a3a3a;
+            flex-basis: 10%;
+            width: 10%;
+        }
+
+        tbody td:nth-child(n+2) {
+            flex-basis: 14.28%;
+            width: 14.28%;
+        }
+
+        /* td를 상하 분할 레이아웃으로 설정 */
+        tbody td {
+            flex-direction: column;
+            position: relative;
+            padding: 0;
+        }
+
+        /* 일반 td (내근 등) - .section이 없는 경우만 */
+        tbody td:not(.morning-half):not(.afternoon-half):not(.full-status):not(:has(.section)) {
+            padding: clamp(8px, 1vmin, 16px);
+        }
+
+        /* 오전/오후 둘 다 있는 td (.section을 가진 경우) */
+        tbody td:has(.section) {
+            padding: 0;
+        }
+
+        /* 오전 상태 (상단에만 표시, 하단 공백) */
+        tbody td.morning-half {
+            padding: 0 !important;
+        }
+
+        .morning-content {
+            flex: 0 0 50%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(4px, 0.8vmin, 10px);
+        }
+
+        tbody td.morning-half::after {
+            content: '';
+            flex: 0 0 50%;
+        }
+
+        /* 오후 상태 (상단 공백, 하단에만 표시) */
+        tbody td.afternoon-half {
+            padding: 0 !important;
+        }
+
+        tbody td.afternoon-half::before {
+            content: '';
+            flex: 0 0 50%;
+        }
+
+        .afternoon-content {
+            flex: 0 0 50%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(4px, 0.8vmin, 10px);
+        }
+
+        /* 전체 상태 (100% 표시) - 기존대로 */
+        tbody td.full-status {
+            padding: clamp(8px, 1vmin, 16px);
+        }
+
+        tbody td.full-status .status {
+            margin-bottom: 4px;
+        }
+
+        /* 오전/오후 섹션 (같은 셀에 오전과 오후가 모두 있을 때) */
+        .section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-height: 0;
+            padding: clamp(4px, 0.8vmin, 10px);
+            min-width: 0;
+        }
+
+        /* 오전 섹션 */
+        .section.morning {
+            border-bottom: 1px solid #555555;
+        }
+
+        /* 오후 섹션이 있으면 위에 가로 구분선 추가 */
+        .section.afternoon {
+            border-top: 2px solid #555555;
+        }
+
+        /* 상태별 라벨 스타일 - 다크모드 */
+        .status {
+            display: block;
+            width: 100%;
+            padding: clamp(4px, 0.6vmin, 10px) clamp(6px, 1vmin, 16px);
+            border-radius: 4px;
+            font-size: clamp(11px, 1.2vmin, 22px);
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .trip { background-color: #5a2c2c; color: #ff8080; }
+        .outside { background-color: #2c4a52; color: #64b5f6; }
+        .interior { background-color: #3a5a3a; color: #80d080; }
+        .vacation { background-color: #4a3a5a; color: #b39ddb; }
+        .office { color: #a0a0a0; font-size: clamp(12px, 1.2vmin, 22px); }
+
+        .desc {
+            display: block;
+            font-size: clamp(10px, 1vmin, 18px);
+            color: #b0b0b0;
+            margin-top: 2px;
+        }
+
+        .position {
+            font-size: clamp(10px, 1vmin, 18px);
+            color: #a0a0a0;
+        }
+
+        /* 요일별 색상 - 다크모드 */
+        .sunday { color: #ff6b6b; }
+        .saturday { color: #74c0fc; }
+
+        /* 범례 */
+        .legend {
+            width: 100%;
+            text-align: center;
+            font-size: clamp(11px, 1.2vmin, 20px);
+        }
+        .legend span { margin-left: clamp(8px, 1vmin, 16px); }
+
+        /* 업데이트 시간 */
+        .update-time {
+            text-align: right;
+            font-size: clamp(9px, 0.9vmin, 14px);
+            color: #888888;
+            padding-top: 10px;
+        }
+
+        @media print {
+            body { background-color: #fff; padding: 0; color: #333; }
+            .container { box-shadow: none; max-width: 100%; background-color: #fff; }
+            .status { border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-top">
+            <h1>주간 업무 및 출장 현황</h1>
+            <div class="date-range">2026.01.25 (일) ~ 01.31 (토)</div>
+        </div>
+        <div class="legend">
+            <span style="color:#64b5f6">■ 외근/오전외근/오후외근</span>
+            <span style="color:#80d080">■ 오전내근/오후내근</span>
+            <span style="color:#b39ddb">■ 휴가/연차/반차</span>
+        </div>
+    </header>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%">성명</th>
+                    <th style="width: 14.28%" class="sunday">일 (Sun)<br><small>01/25</small></th>
+                    <th style="width: 14.28%">월 (Mon)<br><small>01/26</small></th>
+                    <th style="width: 14.28%">화 (Tue)<br><small>01/27</small></th>
+                    <th style="width: 14.28%">수 (Wed)<br><small>01/28</small></th>
+                    <th style="width: 14.28%">목 (Thu)<br><small>01/29</small></th>
+                    <th style="width: 14.28%">금 (Fri)<br><small>01/30</small></th>
+                    <th style="width: 14.28%" class="saturday">토 (Sat)<br><small>01/31</small></th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>조래홍</td>
+                    <td class="sunday"></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td class="full-status"><span class="status outside">🚗외근</span>
+                        <span class="desc">22</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td class="saturday"></td>
+                    </tr>
+                <tr>
+                    <td>이상준</td>
+                    <td class="sunday"></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td class="saturday"></td>
+                    </tr>
+                <tr>
+                    <td>이의준</td>
+                    <td class="sunday"></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td class="saturday"></td>
+                    </tr>
+                <tr>
+                    <td>이호욱</td>
+                    <td class="sunday"></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td><span class="office">내근</span></td>
+                    <td class="saturday"></td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <div class="update-time">Last Update: 2026-01-29 15:32:37</div>
+</div>
+
+</body>
+</html>

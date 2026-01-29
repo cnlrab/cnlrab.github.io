@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 업무 및 출장 작성</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f9f9f9; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        
+        /* 필수 입력 표시 */
+        label.required::after { content: " *"; color: red; }
+
+        input[type="text"], input[type="email"], input[type="date"], select, textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;
+        }
+        
+        button { width: 100%; padding: 12px; background-color: #4285F4; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #357ae8; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* 버튼형 라디오 스타일 */
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-group input[type="radio"] { display: none; }
+        .btn-group label {
+            flex: 1; min-width: 80px; padding: 12px 16px; text-align: center;
+            border: 2px solid #ddd; border-radius: 6px; cursor: pointer;
+            font-size: 14px; font-weight: bold; color: #555; background: #fff;
+            transition: all 0.2s ease;
+        }
+        .btn-group label:hover { border-color: #4285F4; color: #4285F4; }
+        .btn-group input[type="radio"]:checked + label {
+            background-color: #4285F4; color: white; border-color: #4285F4;
+        }
+
+        /* 날짜 한줄 배치 */
+        .date-row { display: flex; align-items: center; gap: 10px; }
+        .date-row input[type="date"] { flex: 1; }
+        .date-separator { color: #555; font-weight: bold; }
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; padding: 30px 40px; border-radius: 12px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-icon { font-size: 48px; margin-bottom: 15px; }
+        .modal-title { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .modal-timer { font-size: 14px; color: #888; }
+        .modal-timer span { font-weight: bold; color: #4285F4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>주간 업무 및 출장 작성</h2>
+    <form id="appForm">
+        
+        <div class="form-group">
+            <label for="name" class="required">성명</label>
+            <select id="name" name="name" required>
+                <option value="" disabled selected>선택하세요</option>
+                <option value="조래홍" data-email="">조래홍</option>
+                <option value="이상준" data-email="">이상준</option>
+                <option value="이의준" data-email="">이의준</option>
+                <option value="이호욱" data-email="">이호욱</option>
+
+            </select>
+        </div>
+
+        <!-- 이메일: 성명 선택 시 자동 입력, 화면에서 숨김 -->
+        <input type="hidden" id="email" name="email">
+
+        <div class="form-group">
+            <label class="required">구분</label>
+            <div class="btn-group">
+                <input type="radio" id="type1" name="type" value="🚗외근" required>
+                <label for="type1">🚗외근</label>
+                <input type="radio" id="type2" name="type" value="🚗오전외근">
+                <label for="type2">🚗오전외근</label>
+                <input type="radio" id="type3" name="type" value="🚗오후외근">
+                <label for="type3">🚗오후외근</label>
+                <input type="radio" id="type4" name="type" value="🏢오전내근">
+                <label for="type4">🏢오전내근</label>
+                <input type="radio" id="type5" name="type" value="🏢오후내근">
+                <label for="type5">🏢오후내근</label>
+                <input type="radio" id="type6" name="type" value="😴연차">
+                <label for="type6">😴연차</label>
+                <input type="radio" id="type7" name="type" value="😴오전반차">
+                <label for="type7">😴오전반차</label>
+                <input type="radio" id="type8" name="type" value="😴오후반차">
+                <label for="type8">😴오후반차</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="required">기간</label>
+            <div class="date-row">
+                <input type="date" id="startDate" name="startDate" required>
+                <span class="date-separator">~</span>
+                <input type="date" id="endDate" name="endDate" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="reason">사유</label>
+            <input type="text" id="reason" name="reason" placeholder="간단한 사유를 입력하세요">
+        </div>
+
+        <!-- 승인상태: 숨김 처리 -->
+        <input type="hidden" id="status" name="status" value="">
+
+        <button type="submit" id="submitBtn">제출하기</button>
+    </form>
+</div>
+
+<!-- 완료 모달 -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+        <div class="modal-icon">✅</div>
+        <div class="modal-title">성공적으로 등록되었습니다</div>
+        <div class="modal-timer"><span id="countdown">5</span>초 후 자동으로 닫힙니다</div>
+    </div>
+</div>
+
+<script>
+    // ▼▼▼ 여기에 배포된 웹 앱 URL을 붙여넣으세요 ▼▼▼
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzJj5aRhVCVUFq2JK-8868t2ssDm76tGxLB0PVcX7BHCMkT_L2GKWc2yH--C8GQD1a7g/exec";
+
+    const form = document.getElementById('appForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const nameSelect = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+
+    // 성명 선택 시 이메일 자동 입력
+    nameSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const email = selectedOption.getAttribute('data-email') || '';
+        emailInput.value = email;
+    });
+
+    // 날짜 기본값: 당일
+    const today = new Date().toISOString().split('T')[0];
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    startDateInput.value = today;
+    endDateInput.value = today;
+
+    // 시작일 변경 시 종료일도 동일하게 변경
+    startDateInput.addEventListener('change', function() {
+        endDateInput.value = this.value;
+    });
+
+    // 성공 모달 표시 함수
+    function showSuccessModal() {
+        const modal = document.getElementById('successModal');
+        const countdownEl = document.getElementById('countdown');
+        let seconds = 5;
+
+        modal.classList.add('show');
+        countdownEl.textContent = seconds;
+
+        const timer = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                modal.classList.remove('show');
+            }
+        }, 1000);
+
+        // 모달 클릭 시 즉시 닫기
+        modal.onclick = function() {
+            clearInterval(timer);
+            modal.classList.remove('show');
+        };
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 버튼 비활성화 (중복 전송 방지)
+        submitBtn.disabled = true;
+        submitBtn.innerText = "저장 중...";
+
+        // 폼 데이터 수집
+        const selectedType = document.querySelector('input[name="type"]:checked');
+        const formData = {
+            name: form.name.value,
+            email: form.email.value,
+            type: selectedType ? selectedType.value : '',
+            startDate: form.startDate.value,
+            endDate: form.endDate.value,
+            reason: form.reason.value,
+            status: form.status.value,
+            timestamp: new Date().toLocaleString('ko-KR')
+        };
+
+        // 데이터 전송
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(formData),
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' }
+        })
+        .then(() => {
+            form.reset(); // 폼 초기화
+            // 날짜 기본값 다시 설정
+            startDateInput.value = today;
+            endDateInput.value = today;
+            // 모달 표시
+            showSuccessModal();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("저장에 실패했습니다.");
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "제출하기";
+        });
+    });
+</script>
+
+</body>
+</html>
